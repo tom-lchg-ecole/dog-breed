@@ -24,7 +24,7 @@ ALLOWED_IMAGE_TYPES = {"image/jpeg", "image/png", "image/webp"}
 
 # Chemins vers le modèle et les labels (depuis la racine du projet)
 BASE = Path(__file__).resolve().parent.parent
-MODEL_PATH = BASE / "dog_breed_model.h5"
+MODEL_PATH = BASE / "model" / "dog_breed_best.keras"
 LABELS_PATH = BASE / "model" / "labels.json"
 
 # Chargement du modèle et des labels au démarrage
