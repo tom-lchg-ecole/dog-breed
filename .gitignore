@@ -8,4 +8,4 @@ venv/
 .env/
 
 dataset
-model
+dog_breed_model.h5
