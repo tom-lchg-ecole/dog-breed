@@ -1,36 +1,63 @@
+const API = "http://localhost:8000";
+const statusEl = document.getElementById("status");
+const inputEl = document.getElementById("imageInput");
+const sendBtn = document.getElementById("sendBtn");
+const serverStatus = document.getElementById("serverStatus");
+
+function setState(state, message) {
+  statusEl.textContent = message;
+  statusEl.dataset.state = state;
+  sendBtn.disabled = state === "loading";
+  inputEl.disabled = state === "loading";
+}
+
 /**
  * Envoie l'image sélectionnée au backend via POST multipart/form-data.
  */
 function sendImage() {
-  const input = document.getElementById("imageInput");
-  const file = input?.files?.[0];
+  const file = inputEl?.files?.[0];
 
   if (!file) {
-    console.warn("Aucun fichier sélectionné.");
+    setState("error", "Veuillez sélectionner une image.");
     return;
   }
+
+  setState("loading", "Analyse en cours…");
 
   const formData = new FormData();
   formData.append("file", file);
 
-  fetch("http://localhost:8000/predict", {
+  fetch(API + "/predict", {
     method: "POST",
     body: formData,
   })
     .then((response) => {
       if (!response.ok) {
-        throw new Error(`Erreur HTTP ${response.status}`);
+        return response.json().catch(() => ({ detail: `Erreur HTTP ${response.status}` })).then((body) => {
+          const d = body.detail;
+          const msg = typeof d === "string" ? d : (Array.isArray(d) && d[0]?.msg) ? d[0].msg : body.message || `Erreur ${response.status}`;
+          throw new Error(msg);
+        });
       }
       return response.json();
     })
     .then((data) => {
-      console.log(data);
+      const p = data.processing_time_ms != null ? ` (${data.processing_time_ms} ms)` : "";
+      setState("success", `Race : ${data.race} — Confiance : ${(data.confiance * 100).toFixed(1)}%${p}`);
     })
     .catch((err) => {
-      console.error("Erreur lors de l'envoi:", err);
+      setState("error", "Erreur : " + (err.message || "échec de la requête"));
     });
 }
 
+function checkServer() {
+  fetch(API + "/health")
+    .then((r) => r.json())
+    .then((d) => { serverStatus.textContent = d.status === "ready" ? "Serveur prêt" : "Serveur indisponible"; })
+    .catch(() => { serverStatus.textContent = "Serveur indisponible"; });
+}
+
 document.addEventListener("DOMContentLoaded", () => {
-  document.getElementById("sendBtn").addEventListener("click", sendImage);
+  checkServer();
+  sendBtn.addEventListener("click", sendImage);
 });
