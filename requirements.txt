@@ -4,3 +4,6 @@ scikit-learn>=1.3
 mlxtend>=0.22.0
 matplotlib>=3.7
 tensorflow>=2.15
+fastapi
+uvicorn[standard]
+python-multipart
