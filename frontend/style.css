@@ -1,0 +1,254 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
+    Ubuntu, Cantarell, sans-serif;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
+  padding: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.container {
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  padding: 40px;
+  max-width: 800px;
+  width: 100%;
+}
+
+h1 {
+  text-align: center;
+  color: #333;
+  margin-bottom: 10px;
+  font-size: 2rem;
+}
+
+.server-status {
+  text-align: center;
+  margin-bottom: 30px;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.server-status.ready {
+  color: #10b981;
+}
+
+.server-status.error {
+  color: #ef4444;
+}
+
+.dropzone {
+  border: 3px dashed #cbd5e1;
+  border-radius: 15px;
+  padding: 40px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: #f8fafc;
+  margin-bottom: 20px;
+}
+
+.dropzone:hover {
+  border-color: #667eea;
+  background: #f1f5f9;
+}
+
+.dropzone.dragover {
+  border-color: #667eea;
+  background: #eef2ff;
+  transform: scale(1.02);
+}
+
+.dropzone-icon {
+  font-size: 3rem;
+  margin-bottom: 15px;
+}
+
+.dropzone-text {
+  color: #64748b;
+  font-size: 1.1rem;
+  margin-bottom: 10px;
+}
+
+.dropzone-hint {
+  color: #94a3b8;
+  font-size: 0.9rem;
+}
+
+#imageInput {
+  display: none;
+}
+
+.image-preview {
+  margin: 20px 0;
+  text-align: center;
+  display: none;
+}
+
+.image-preview.show {
+  display: block;
+}
+
+.image-preview img {
+  max-width: 100%;
+  max-height: 400px;
+  border-radius: 15px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  object-fit: contain;
+}
+
+.button-container {
+  text-align: center;
+  margin: 20px 0;
+}
+
+#sendBtn {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  padding: 15px 40px;
+  font-size: 1.1rem;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+}
+
+#sendBtn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+}
+
+#sendBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.status {
+  text-align: center;
+  padding: 15px;
+  border-radius: 10px;
+  margin: 20px 0;
+  font-weight: 500;
+}
+
+.status.loading {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.status.success {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.status.error {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.results {
+  margin-top: 30px;
+  display: none;
+}
+
+.results.show {
+  display: block;
+}
+
+.results-title {
+  font-size: 1.5rem;
+  color: #333;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.race-item {
+  margin-bottom: 25px;
+  padding: 20px;
+  background: #f8fafc;
+  border-radius: 12px;
+  border-left: 4px solid #667eea;
+}
+
+.race-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.race-name {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.race-percentage {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #667eea;
+}
+
+.slider-container {
+  position: relative;
+  margin-top: 10px;
+}
+
+.slider {
+  width: 100%;
+  height: 12px;
+  border-radius: 6px;
+  background: #e2e8f0;
+  outline: none;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.4);
+}
+
+.slider::-moz-range-thumb {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  cursor: pointer;
+  border: none;
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.4);
+}
+
+.slider-track {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 12px;
+  border-radius: 6px;
+  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+  pointer-events: none;
+  transition: width 0.3s ease;
+}
+
+.processing-time {
+  text-align: center;
+  color: #64748b;
+  font-size: 0.9rem;
+  margin-top: 20px;
+}

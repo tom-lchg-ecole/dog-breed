@@ -1,14 +1,48 @@
 <!DOCTYPE html>
 <html lang="fr">
-<head>
-  <meta charset="UTF-8">
-  <title>Upload chien</title>
-</head>
-<body>
-  <p><span id="serverStatus">Vérification du serveur…</span></p>
-  <input type="file" accept="image/*" id="imageInput">
-  <button id="sendBtn">Envoyer</button>
-  <div id="status" aria-live="polite"></div>
-  <script src="script.js"></script>
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Détection de Race de Chien</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="container">
+      <h1>🐕 Détection de Race de Chien</h1>
+      <div class="server-status" id="serverStatus">
+        Vérification du serveur…
+      </div>
+
+      <div class="dropzone" id="dropzone">
+        <div class="dropzone-icon">📸</div>
+        <div class="dropzone-text">Glissez-déposez une image ici</div>
+        <div class="dropzone-hint">ou cliquez pour sélectionner un fichier</div>
+      </div>
+
+      <input type="file" accept="image/*" id="imageInput" />
+
+      <div class="image-preview" id="imagePreview">
+        <img id="previewImage" alt="Aperçu de l'image" />
+      </div>
+
+      <div class="button-container">
+        <button id="sendBtn">Analyser l'image</button>
+      </div>
+
+      <div
+        id="status"
+        class="status"
+        aria-live="polite"
+        style="display: none"
+      ></div>
+
+      <div class="results" id="results">
+        <h2 class="results-title">Résultats de l'analyse</h2>
+        <div id="racesList"></div>
+        <div class="processing-time" id="processingTime"></div>
+      </div>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
 </html>
