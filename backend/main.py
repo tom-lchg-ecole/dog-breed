@@ -67,9 +67,17 @@ async def predict(file: UploadFile = File(...)):
     batch = np.expand_dims(arr, axis=0)
 
     pred = model.predict(batch, verbose=0)
-    idx = int(pred[0].argmax())
-    confiance = float(pred[0][idx])
-    race = LABELS[idx]
+    
+    # Obtenir les indices des 3 meilleures prédictions (triées par ordre décroissant)
+    top_3_indices = np.argsort(pred[0])[-3:][::-1]
+    
+    # Construire la liste des 3 races les plus probables
+    top_3_races = []
+    for idx in top_3_indices:
+        top_3_races.append({
+            "race": LABELS[int(idx)],
+            "confiance": float(pred[0][idx])
+        })
 
     elapsed_ms = round((time.perf_counter() - t0) * 1000)
-    return {"race": race, "confiance": confiance, "processing_time_ms": elapsed_ms}
+    return {"top_3": top_3_races, "processing_time_ms": elapsed_ms}
