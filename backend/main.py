@@ -22,14 +22,35 @@ app.add_middleware(
 
 ALLOWED_IMAGE_TYPES = {"image/jpeg", "image/png", "image/webp"}
 
-# Chemins vers le modèle et les labels (depuis la racine du projet)
+# Chemins vers le dossier des modèles et les labels (depuis la racine du projet)
 BASE = Path(__file__).resolve().parent.parent
-MODEL_PATH = BASE / "model" / "dog_breed_best.keras"
-LABELS_PATH = BASE / "model" / "labels.json"
+MODEL_DIR = BASE / "model"
+LABELS_PATH = MODEL_DIR / "labels.json"
 
-# Chargement du modèle et des labels au démarrage
-model = load_model(MODEL_PATH)
+# Cache des modèles chargés (nom fichier -> modèle Keras)
+models_cache = {}
 
+
+def get_available_models():
+    """Retourne la liste des fichiers .keras dans model/."""
+    if not MODEL_DIR.exists():
+        return []
+    return sorted(p.name for p in MODEL_DIR.glob("*.keras"))
+
+
+def get_model(model_name: str | None = None):
+    """Charge le modèle demandé (ou le premier disponible). Met en cache."""
+    available = get_available_models()
+    if not available:
+        raise FileNotFoundError("Aucun fichier .keras trouvé dans model/")
+    name = model_name if model_name and model_name in available else available[0]
+    if name not in models_cache:
+        path = MODEL_DIR / name
+        models_cache[name] = load_model(path)
+    return models_cache[name]
+
+
+# Labels partagés par tous les modèles
 if LABELS_PATH.exists():
     with open(LABELS_PATH, "r", encoding="utf-8") as f:
         LABELS = json.load(f)
@@ -45,12 +66,38 @@ def health():
     return {"status": "ready"}
 
 
+@app.get("/models")
+def list_models():
+    """Liste les noms des modèles .keras disponibles dans model/."""
+    models = get_available_models()
+    return {"models": models}
+
+
 @app.post("/predict")
-async def predict(file: UploadFile = File(...)):
+async def predict(
+    file: UploadFile = File(...),
+    model: str | None = None,
+):
+    """
+    Prédit la race du chien sur l'image.
+    model: nom du fichier .keras (ex: model_512.keras). Si absent, utilise le premier disponible.
+    """
     t0 = time.perf_counter()
 
     if file.content_type not in ALLOWED_IMAGE_TYPES:
         raise HTTPException(400, "Type de fichier non supporté")
+
+    available = get_available_models()
+    if not available:
+        raise HTTPException(404, "Aucun modèle .keras trouvé dans model/")
+    if model is not None and model not in available:
+        raise HTTPException(400, f"Modèle inconnu: {model}")
+
+    try:
+        current_model = get_model(model)
+    except FileNotFoundError as e:
+        raise HTTPException(404, str(e)) from e
+    model_used = model if model else available[0]
 
     contents = await file.read()
 
@@ -65,7 +112,7 @@ async def predict(file: UploadFile = File(...)):
     arr = mobilenet_preprocess(arr)
     batch = np.expand_dims(arr, axis=0)
 
-    pred = model.predict(batch, verbose=0)
+    pred = current_model.predict(batch, verbose=0)
     
     top_3_indices = np.argsort(pred[0])[-3:][::-1]
     
@@ -78,4 +125,8 @@ async def predict(file: UploadFile = File(...)):
         })
 
     elapsed_ms = round((time.perf_counter() - t0) * 1000)
-    return {"top_3": top_3_races, "processing_time_ms": elapsed_ms}
+    return {
+        "top_3": top_3_races,
+        "processing_time_ms": elapsed_ms,
+        "model_used": model_used,
+    }

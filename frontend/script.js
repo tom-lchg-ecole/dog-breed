@@ -3,6 +3,7 @@ const statusEl = document.getElementById("status");
 const inputEl = document.getElementById("imageInput");
 const sendBtn = document.getElementById("sendBtn");
 const serverStatus = document.getElementById("serverStatus");
+const modelSelect = document.getElementById("modelSelect");
 const dropzone = document.getElementById("dropzone");
 const imagePreview = document.getElementById("imagePreview");
 const previewImage = document.getElementById("previewImage");
@@ -73,11 +74,16 @@ function displayResults(data) {
       racesList.appendChild(raceItem);
     });
 
+    let timeText = "";
     if (data.processing_time_ms != null) {
-      processingTime.textContent = `Temps de traitement : ${data.processing_time_ms} ms`;
-    } else {
-      processingTime.textContent = "";
+      timeText = `Temps de traitement : ${data.processing_time_ms} ms`;
     }
+    if (data.model_used) {
+      timeText = timeText
+        ? `${timeText} — Modèle : ${data.model_used}`
+        : `Modèle utilisé : ${data.model_used}`;
+    }
+    processingTime.textContent = timeText || "";
 
     results.classList.add("show");
   } else {
@@ -128,7 +134,12 @@ function sendImage() {
   const formData = new FormData();
   formData.append("file", file);
 
-  fetch(API + "/predict", {
+  const selectedModel = modelSelect?.value || "";
+  const predictUrl = selectedModel
+    ? `${API}/predict?model=${encodeURIComponent(selectedModel)}`
+    : `${API}/predict`;
+
+  fetch(predictUrl, {
     method: "POST",
     body: formData,
   })
@@ -178,6 +189,31 @@ function checkServer() {
     });
 }
 
+/**
+ * Remplit le sélecteur de modèles depuis l'API /models
+ */
+function loadModels() {
+  fetch(API + "/models")
+    .then((r) => r.json())
+    .then((d) => {
+      const list = d.models || [];
+      modelSelect.innerHTML = "";
+      if (list.length === 0) {
+        modelSelect.innerHTML = '<option value="">Aucun modèle disponible</option>';
+        return;
+      }
+      list.forEach((name) => {
+        const opt = document.createElement("option");
+        opt.value = name;
+        opt.textContent = name;
+        modelSelect.appendChild(opt);
+      });
+    })
+    .catch(() => {
+      modelSelect.innerHTML = '<option value="">Erreur chargement des modèles</option>';
+    });
+}
+
 // Gestion de la dropzone
 dropzone.addEventListener("click", () => {
   inputEl.click();
@@ -213,6 +249,7 @@ inputEl.addEventListener("change", (e) => {
 
 document.addEventListener("DOMContentLoaded", () => {
   checkServer();
+  loadModels();
   sendBtn.addEventListener("click", sendImage);
 
   // Vérifier le serveur toutes les 5 secondes

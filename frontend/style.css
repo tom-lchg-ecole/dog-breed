@@ -46,6 +46,37 @@ h1 {
   color: #ef4444;
 }
 
+.model-selector {
+  margin-bottom: 24px;
+}
+
+.model-selector label {
+  display: block;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #475569;
+  margin-bottom: 8px;
+}
+
+.model-selector select {
+  width: 100%;
+  max-width: 320px;
+  padding: 12px 16px;
+  font-size: 1rem;
+  border: 2px solid #e2e8f0;
+  border-radius: 10px;
+  background: #fff;
+  color: #1e293b;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+
+.model-selector select:hover,
+.model-selector select:focus {
+  border-color: #667eea;
+  outline: none;
+}
+
 .dropzone {
   border: 3px dashed #cbd5e1;
   border-radius: 15px;
