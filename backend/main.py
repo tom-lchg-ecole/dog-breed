@@ -42,7 +42,6 @@ else:
 
 @app.get("/health")
 def health():
-    """Indique que le serveur et le modèle sont prêts."""
     return {"status": "ready"}
 
 
@@ -68,7 +67,6 @@ async def predict(file: UploadFile = File(...)):
 
     pred = model.predict(batch, verbose=0)
     
-    # Obtenir les indices des 3 meilleures prédictions (triées par ordre décroissant)
     top_3_indices = np.argsort(pred[0])[-3:][::-1]
     
     # Construire la liste des 3 races les plus probables
